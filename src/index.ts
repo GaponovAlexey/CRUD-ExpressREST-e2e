@@ -1,10 +1,11 @@
 import express from "express";
 
-const app = express();
+export const app = express();
 
 app.use(express.json());
 
 const port = 3000;
+
 const db = {
   courses: [
     { id: 1, title: "front" },
@@ -14,11 +15,15 @@ const db = {
 };
 // app.use(bodyParser.json({ type: 'application/*+json' }))
 app.get("/skill", (req, res) => {
-  const qSkill = db.courses.filter(
-    (s) => s.title.indexOf(req.query.title as string) > -1
-  );
+  let foundCurses = db.courses;
 
-  res.json(qSkill.length <= 0 ? db : qSkill);
+  if (req.query.title) {
+    foundCurses = foundCurses.filter(
+      (s) => s.title.indexOf(req.query.title as string) > -1
+    );
+  }
+
+  res.json(foundCurses);
 });
 
 app.get("/skill/:id", (req, res) => {
@@ -49,7 +54,6 @@ app.post("/skill", (req, res) => {
 });
 
 app.delete("/skill/:id", (req, res) => {
-  
   db.courses = db.courses.filter((c) => c.id !== +req.params.id);
 
   res.sendStatus(204);
@@ -65,7 +69,7 @@ app.put("/skill/:id", (req, res) => {
     res.sendStatus(404);
     return;
   }
-  findSkill.title = req.body.title
+  findSkill.title = req.body.title;
 
   res.sendStatus(204);
 });
