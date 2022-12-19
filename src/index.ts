@@ -1,4 +1,4 @@
-import express from "express"
+import express, { Request, Response } from "express"
 
 export const app = express()
 
@@ -6,7 +6,12 @@ app.use(express.json())
 
 const port = 3000
 
-const db = {
+type cursesType = {
+  id: number
+  title: string
+}
+
+const db: { courses: cursesType[] } = {
   courses: [
     { id: 1, title: "front" },
     { id: 2, title: "back" },
@@ -24,17 +29,23 @@ export const HTTP_STATUSES = {
 }
 
 // app.use(bodyParser.json({ type: 'application/*+json' }))
-app.get("/skill", (req, res) => {
-  let foundCurses = db.courses
+app.get(
+  "/skill",
+  (
+    req: Request<{}, {}, {}, { title: string }>,
+    res: Response<cursesType[]>
+  ) => {
+    let foundCurses = db.courses
 
-  if (req.query.title) {
-    foundCurses = foundCurses.filter(
-      (s) => s.title.indexOf(req.query.title as string) > -1
-    )
+    if (req.query.title) {
+      foundCurses = foundCurses.filter(
+        (s) => s.title.indexOf(req.query.title) > -1
+      )
+    }
+
+    res.json(foundCurses)
   }
-
-  res.json(foundCurses)
-})
+)
 
 app.get("/skill/:id", (req, res) => {
   const findSkill = db.courses.find((c) => c.id === +req.params.id)
