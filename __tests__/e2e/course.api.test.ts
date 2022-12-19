@@ -17,4 +17,27 @@ describe("/", () => {
       .send({ title: "" })
       .expect(HTTP_STATUSES.BAD_REQUEST_400)
   })
+  it("shouldn't create skill 400 if bad and 200 after create ", async () => {
+    await request(app)
+      .post("/skill")
+      .send({ title: "" })
+      .expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+    await request(app).get("/skill").expect(HTTP_STATUSES.OK_200, [])
+  })
+  it("should create skill request 200, and body after create", async () => {
+    const createResponse = await request(app)
+      .post("/skill")
+      .send({ title: "big Data" })
+      .expect(HTTP_STATUSES.CREATED_201)
+
+    expect(createResponse.body).toEqual({
+      id: expect.any(Number),
+      title: "big Data",
+    })
+
+    await request(app)
+      .get("/skill")
+      .expect(HTTP_STATUSES.OK_200, [createResponse.body])
+  })
 })
