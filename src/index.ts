@@ -20,7 +20,6 @@ export const HTTP_STATUSES = {
   NOT_FOUND_404: 404,
 }
 
-
 const port = 3000
 
 const db: { courses: cursesType[] } = {
@@ -30,6 +29,13 @@ const db: { courses: cursesType[] } = {
     { id: 3, title: "web3" },
   ],
 }
+
+const getDataViewModel = (db: cursesType): cursesType => { // need
+  return {
+    id: db.id,
+    title: db.title,
+  }
+} 
 
 //GET_ALL
 app.get(
@@ -43,12 +49,14 @@ app.get(
       )
     }
 
-    res.json(foundCurse.map(db => {
-      return {
-        id: db.id,
-        title: db.title
-      }
-    }))
+    res.json(
+      foundCurse.map((db) => {
+        return {
+          id: db.id,
+          title: db.title,
+        }
+      })
+    )
   }
 )
 //GET_ID
@@ -62,7 +70,7 @@ app.get(
       return
     }
 
-    res.json(findSkill)
+    res.json(getDataViewModel(findSkill))
   }
 )
 //POST
@@ -81,7 +89,7 @@ app.post(
 
     db.courses.push(createSkill)
 
-    res.status(201).json(createSkill)
+    res.status(201).json(getDataViewModel(createSkill))
   }
 )
 
