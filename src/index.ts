@@ -1,4 +1,5 @@
 import {
+  cursesType,
   RequestWithBody,
   RequestWithParam,
   RequestWithParamsAndBody,
@@ -11,11 +12,6 @@ export const app = express()
 app.use(express.json())
 
 const port = 3000
-
-type cursesType = {
-  id: number
-  title: string
-}
 
 const db: { courses: cursesType[] } = {
   courses: [
@@ -37,10 +33,7 @@ export const HTTP_STATUSES = {
 //GET_ALL
 app.get(
   "/skill",
-  (
-    req: Request<{}, {}, {}, { title: string }>,
-    res: Response<cursesType[]>
-  ) => {
+  (req: Request<{}, {}, {}, CreateInputModel>, res: Response<cursesType[]>) => {
     let foundCurse = db.courses
 
     if (req.query.title) {
@@ -69,7 +62,7 @@ app.get(
 //POST
 app.post(
   "/skill",
-  (req: RequestWithBody<{ title: string }>, res: Response<cursesType>) => {
+  (req: RequestWithBody<CreateInputModel>, res: Response<cursesType>) => {
     if (!req.body.title) {
       res.sendStatus(400)
       return
