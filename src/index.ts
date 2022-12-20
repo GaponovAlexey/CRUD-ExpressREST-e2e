@@ -1,4 +1,10 @@
+import {
+  RequestWithBody,
+  RequestWithParam,
+  RequestWithParamsAndBody,
+} from "./types"
 import express, { Request, Response } from "express"
+import { CreateInputModel } from "./model/createModel"
 
 export const app = express()
 
@@ -49,11 +55,11 @@ app.get(
 //GET_ID
 app.get(
   "/skill/:id",
-  (req: Request<{ id: string }>, res: Response<cursesType>) => {
+  (req: RequestWithParam<{ id: string }>, res: Response<cursesType>) => {
     const findSkill = db.courses.find((c) => c.id === +req.params.id)
 
     if (!findSkill) {
-      res.sendStatus(404)
+      res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
       return
     }
 
@@ -63,7 +69,7 @@ app.get(
 //POST
 app.post(
   "/skill",
-  (req: Request<{}, {}, { title: string }>, res: Response<cursesType>) => {
+  (req: RequestWithBody<{ title: string }>, res: Response<cursesType>) => {
     if (!req.body.title) {
       res.sendStatus(400)
       return
@@ -80,26 +86,32 @@ app.post(
   }
 )
 
-app.delete("/skill/:id", (req: Request<{ id: string }>, res: Response) => {
-  db.courses = db.courses.filter((c) => c.id !== +req.params.id)
+app.delete(
+  "/skill/:id",
+  (req: RequestWithParam<{ id: string }>, res: Response) => {
+    db.courses = db.courses.filter((c) => c.id !== +req.params.id)
 
-  res.sendStatus(204)
-})
-app.put("/skill/:id", (req: Request<{id: string}, {}, { title: string }>, res) => {
-  if (!req.body.title) {
-    res.sendStatus(400)
-    return
+    res.sendStatus(204)
   }
-  const findSkill = db.courses.find((c) => c.id === +req.params.id)
+)
+app.put(
+  "/skill/:id",
+  (req: RequestWithParamsAndBody<{ id: string }, CreateInputModel>, res) => {
+    if (!req.body.title) {
+      res.sendStatus(400)
+      return
+    }
+    const findSkill = db.courses.find((c) => c.id === +req.params.id)
 
-  if (!findSkill) {
-    res.sendStatus(404)
-    return
+    if (!findSkill) {
+      res.sendStatus(404)
+      return
+    }
+    findSkill.title = req.body.title
+
+    res.sendStatus(204)
   }
-  findSkill.title = req.body.title
-
-  res.sendStatus(204)
-})
+)
 app.delete("/__test__/data", (req, res) => {
   db.courses = []
   res.sendStatus(204)
