@@ -6,11 +6,20 @@ import {
 } from "./types"
 import express, { Request, Response } from "express"
 import { CreateInputModel } from "./model/createModel"
-import { HTTP_STATUSES } from "./httpStatus"
 
 export const app = express()
 
 app.use(express.json())
+
+export const HTTP_STATUSES = {
+  OK_200: 200,
+  CREATED_201: 201,
+  NO_CONTENT_204: 204,
+
+  BAD_REQUEST_400: 400,
+  NOT_FOUND_404: 404,
+}
+
 
 const port = 3000
 
@@ -34,7 +43,12 @@ app.get(
       )
     }
 
-    res.json(foundCurse)
+    res.json(foundCurse.map(db => {
+      return {
+        id: db.id,
+        title: db.title
+      }
+    }))
   }
 )
 //GET_ID
