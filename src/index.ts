@@ -28,58 +28,64 @@ export const HTTP_STATUSES = {
   NOT_FOUND_404: 404,
 }
 
-// app.use(bodyParser.json({ type: 'application/*+json' }))
+//GET_ALL
 app.get(
   "/skill",
   (
     req: Request<{}, {}, {}, { title: string }>,
     res: Response<cursesType[]>
   ) => {
-    let foundCurses = db.courses
+    let foundCurse = db.courses
 
     if (req.query.title) {
-      foundCurses = foundCurses.filter(
+      foundCurse = foundCurse.filter(
         (s) => s.title.indexOf(req.query.title) > -1
       )
     }
 
-    res.json(foundCurses)
+    res.json(foundCurse)
+  }
+)
+//GET_ID
+app.get(
+  "/skill/:id",
+  (req: Request<{ id: string }>, res: Response<cursesType>) => {
+    const findSkill = db.courses.find((c) => c.id === +req.params.id)
+
+    if (!findSkill) {
+      res.sendStatus(404)
+      return
+    }
+
+    res.json(findSkill)
+  }
+)
+//POST
+app.post(
+  "/skill",
+  (req: Request<{}, {}, { title: string }>, res: Response<cursesType>) => {
+    if (!req.body.title) {
+      res.sendStatus(400)
+      return
+    }
+
+    const createSkill = {
+      id: +new Date(),
+      title: req.body.title,
+    }
+
+    db.courses.push(createSkill)
+
+    res.status(201).json(createSkill)
   }
 )
 
-app.get("/skill/:id", (req, res) => {
-  const findSkill = db.courses.find((c) => c.id === +req.params.id)
-
-  if (!findSkill) {
-    res.sendStatus(404)
-    return
-  }
-
-  res.json(findSkill)
-})
-
-app.post("/skill", (req, res) => {
-  if (!req.body.title) {
-    res.sendStatus(400)
-    return
-  }
-
-  const createSkill = {
-    id: +new Date(),
-    title: req.body.title,
-  }
-
-  db.courses.push(createSkill)
-
-  res.status(201).json(createSkill)
-})
-
-app.delete("/skill/:id", (req, res) => {
+app.delete("/skill/:id", (req: Request<{ id: string }>, res: Response) => {
   db.courses = db.courses.filter((c) => c.id !== +req.params.id)
 
   res.sendStatus(204)
 })
-app.put("/skill/:id", (req, res) => {
+app.put("/skill/:id", (req: Request<{id: string}, {}, { title: string }>, res) => {
   if (!req.body.title) {
     res.sendStatus(400)
     return
