@@ -6,6 +6,7 @@ import {
 } from "./types"
 import express, { Request, Response } from "express"
 import { CreateInputModel } from "./model/createModel"
+import { HTTP_STATUSES } from "./httpStatus"
 
 export const app = express()
 
@@ -19,15 +20,6 @@ const db: { courses: cursesType[] } = {
     { id: 2, title: "back" },
     { id: 3, title: "web3" },
   ],
-}
-
-export const HTTP_STATUSES = {
-  OK_200: 200,
-  CREATED_201: 201,
-  NO_CONTENT_204: 204,
-
-  BAD_REQUEST_400: 400,
-  NOT_FOUND_404: 404,
 }
 
 //GET_ALL
